@@ -37,6 +37,8 @@ nace_text <- read_file("https://ec.europa.eu/competition/mergers/cases/index/nac
 
 This document is a collapsible list of NACE codes based on this [list on the European Commission website](https://ec.europa.eu/). See the R Markdown code for this page [here](https://github.com/brendanjodowd/nace_page).
 
+---
+
 ```{r , results='asis', echo = F}
 
 
