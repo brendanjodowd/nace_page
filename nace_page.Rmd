@@ -1,0 +1,78 @@
+---
+title: "NACE Code list"
+author: "Brendan O'Dowd"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(htmltools)
+
+
+nace_text <- read_file("https://ec.europa.eu/competition/mergers/cases/index/nace_all.html") %>% 
+  str_split("\n") %>% 
+  unlist() %>% 
+  as_tibble() %>% 
+  rename(text = 1) %>% 
+  mutate(text = str_squish(text)) %>% 
+  filter(! str_detect(text  , "^(<|\\[?&|Page)")) %>% 
+  filter(text != "") %>% 
+  mutate(level = case_when(
+    str_detect(text , "^[:alpha:]\\s") ~ "L1",
+    str_detect(text , "^[:alpha:][:digit:]{1,2}\\s") ~ "L2",
+    str_detect(text , "^[:alpha:][:digit:]{1,2}\\.[:digit:]{1,2}\\s") ~ "L3",
+    str_detect(text , "^[:alpha:][:digit:]{1,2}\\.[:digit:]{1,2}\\.[:digit:]{1,2}\\s") ~ "L4",
+    T ~ "999"
+  ))%>% 
+  mutate(value = 1) %>% 
+  pivot_wider(names_from = level, values_from = value) %>% 
+  mutate(across(L1:L4, ~ if_else(is.na(.), NA_character_, text))) %>% 
+  fill(L1:L3,  .direction = "down") %>% 
+  filter(!is.na(L4))
+```
+
+
+This document is a collapsible list of NACE codes based on this [list on the European Commission website](https://ec.europa.eu/). 
+
+```{r , results='asis', echo = F}
+
+
+for(lev_1 in unique(nace_text$L1)){
+  
+  data_lev_1 <- nace_text %>% filter(L1 == lev_1)
+  cat("<details>")
+  cat("<summary><b>", paste(lev_1) , "</b></summary>")
+  #cat(paste(unique(data_lev_1$L2), sep = "\n"))
+  for(lev_2 in unique(data_lev_1$L2)){
+    data_lev_2 <- nace_text %>% filter(L2 == lev_2)
+    cat("<details>")
+    cat('<summary style="margin-left: 10px">', paste(lev_2) , "</summary>")
+    for(lev_3 in unique(data_lev_2$L3)){
+      data_lev_3 <- nace_text %>% filter(L3 == lev_3)
+      cat("<details>")
+      cat('<summary style="margin-left: 20px">', paste(lev_3) , "</summary>")
+      cat("<ul>")
+        for(lev_4 in unique(data_lev_3$L4)){
+          cat('<li style="margin-left: 30px;">', paste(lev_4) , "</li>")
+          #cat('<pre style="margin-left: 30px;">', paste(lev_4) , "</pre>")
+          #cat('<p style="margin-left: 30px;line-height:1;">', paste(lev_4) , "</p>")
+          #cat('<br style="margin-left: 30px;line-height:1em;">', paste(lev_4) )
+        }
+      cat("</ul>")
+      cat("</details>")
+    }
+    cat("</details>")
+  }
+  cat("</details>")
+}
+
+```
+
+
+
+
+
+
