@@ -46,11 +46,11 @@ for(lev_1 in unique(nace_text$L1)){
   
   data_lev_1 <- nace_text %>% filter(L1 == lev_1)
   cat("<details>")
-  cat("<summary><b>", paste(lev_1) , "</b></summary>")
+  cat('<summary style="font-size:16px;font-weight: bold;">', paste(lev_1) , "</summary>")
   for(lev_2 in unique(data_lev_1$L2)){
     data_lev_2 <- nace_text %>% filter(L2 == lev_2)
     cat("<details>")
-    cat('<summary style="margin-left: 10px">', paste(lev_2) , "</summary>")
+    cat('<summary style="font-size:16px;margin-left: 10px">', paste(lev_2) , "</summary>")
     for(lev_3 in unique(data_lev_2$L3)){
       data_lev_3 <- nace_text %>% filter(L3 == lev_3)
       cat("<details>")
